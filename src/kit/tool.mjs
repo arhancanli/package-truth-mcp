@@ -37,7 +37,7 @@ export function findUnboundedInputs(schema, path = "") {
       if (!has("max_length") && !has("length_equals")) out.push(`${path || "(root)"}: string has no max length`);
       break;
     case "array":
-      if (!has("max_length")) out.push(`${path || "(root)"}: array has no max size`);
+      if (!has("max_length") && !has("length_equals")) out.push(`${path || "(root)"}: array has no max size`);
       out.push(...findUnboundedInputs(def.element, `${path}[]`));
       break;
     case "object":

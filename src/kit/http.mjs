@@ -130,11 +130,17 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, attem
   // several tools resolving the same record, costs one request and one wait instead of many.
   const inFlight = new Map();
 
+  /**
+   * @param {string} raw
+   * @param {{method?: string, headers?: object, body?: string, accept?: string, idempotent?: boolean}} [opts]
+   *   idempotent: a POST that only reads (a search API) is cached, shared in flight and retried like a GET.
+   */
   function request(raw, opts = {}) {
-    const { method = "GET", headers = {}, accept = "application/json" } = opts;
-    const isRead = method === "GET" || method === "HEAD";
-    if (!isRead || Object.keys(headers).length) return send(raw, opts);
-    const key = `${method} ${accept} ${raw}`;
+    const { method = "GET", headers = {}, accept = "application/json", body, idempotent = false } = opts;
+    const isRead = method === "GET" || method === "HEAD" || idempotent;
+    const plain = Object.keys(headers).every((h) => h.toLowerCase() === "content-type");
+    if (!isRead || !plain) return send(raw, opts);
+    const key = `${method} ${accept} ${raw}${body ? ` ${body}` : ""}`;
     const pending = inFlight.get(key);
     if (pending) return pending;
     const p = send(raw, opts).finally(() => inFlight.delete(key));
@@ -142,9 +148,9 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, attem
     return p;
   }
 
-  async function send(raw, { method = "GET", headers = {}, body, accept = "application/json" } = {}) {
-    const isRead = method === "GET" || method === "HEAD";
-    const cacheKey = isRead && cache ? `${accept} ${raw}` : undefined;
+  async function send(raw, { method = "GET", headers = {}, body, accept = "application/json", idempotent = false } = {}) {
+    const isRead = method === "GET" || method === "HEAD" || idempotent;
+    const cacheKey = isRead && cache ? `${method} ${accept} ${raw}${body ? ` ${body}` : ""}` : undefined;
     if (cacheKey) {
       const hit = cache.get(cacheKey);
       if (hit !== undefined) return hit;
