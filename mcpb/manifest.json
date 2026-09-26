@@ -1,0 +1,65 @@
+{
+  "manifest_version": "0.3",
+  "name": "package-truth-mcp",
+  "display_name": "Package Truth",
+  "version": "0.1.0",
+  "description": "Checks that packages exist before an agent installs them: latest version, deprecation, known vulnerabilities and licence across npm, PyPI, Go, Maven, Cargo, NuGet and RubyGems.",
+  "author": {
+    "name": "Arhan Canli",
+    "url": "https://github.com/arhancanli"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arhancanli/package-truth-mcp"
+  },
+  "homepage": "https://github.com/arhancanli/package-truth-mcp#readme",
+  "documentation": "https://github.com/arhancanli/package-truth-mcp#readme",
+  "support": "https://github.com/arhancanli/package-truth-mcp/issues",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "developer-tools",
+    "dependencies",
+    "supply-chain",
+    "slopsquatting",
+    "npm",
+    "pypi",
+    "vulnerabilities"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "src/server.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/src/server.mjs"
+      ]
+    }
+  },
+  "tools": [
+    {
+      "name": "check_manifest",
+      "description": "Check a dependency manifest"
+    },
+    {
+      "name": "check_packages",
+      "description": "Check packages before installing"
+    },
+    {
+      "name": "get_advisories",
+      "description": "Advisories for a package version"
+    }
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=20"
+    }
+  }
+}

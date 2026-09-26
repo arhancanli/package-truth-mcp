@@ -1,0 +1,60 @@
+{
+  "name": "package-truth-mcp",
+  "version": "0.1.0",
+  "description": "Checks that packages exist before an agent installs them: latest version, deprecation, known vulnerabilities and licence across npm, PyPI, Go, Maven, Cargo, NuGet and RubyGems.",
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "Arhan Canli",
+    "url": "https://github.com/arhancanli"
+  },
+  "bin": {
+    "package-truth-mcp": "src/server.mjs"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "npm-shrinkwrap.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "start": "node src/server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.1",
+    "zod": "4.6.5"
+  },
+  "mcpName": "io.github.arhancanli/package-truth-mcp",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "developer-tools",
+    "dependencies",
+    "supply-chain",
+    "slopsquatting",
+    "npm",
+    "pypi",
+    "vulnerabilities"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arhancanli/package-truth-mcp.git"
+  },
+  "homepage": "https://github.com/arhancanli/package-truth-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/arhancanli/package-truth-mcp/issues"
+  },
+  "factory": {
+    "displayName": "Package Truth",
+    "category": "developer-tools",
+    "allowHosts": [
+      "api.deps.dev"
+    ],
+    "toolListBudget": 4000
+  }
+}
