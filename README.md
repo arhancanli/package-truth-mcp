@@ -194,7 +194,12 @@ and gets back (recorded from the live server on 2026-09-26):
 ## Benchmark
 
 <!-- bench:start -->
-Not yet measured.
+Measured 2026-09-26 with gpt-5.4-mini, 10 fixed tasks graded by fixed checks (`bench/tasks.json`, raw results in `bench/results/`).
+
+| Server | Correct | Input tokens | Output tokens | Tool calls | Median time |
+| --- | --- | --- | --- | --- | --- |
+| This server | 10/10 | 13226 | 545 | 10 | 3.3 s |
+| package-version-check-mcp, the best maintained alternative | 7/10 | 28734 | 531 | 10 | 2.9 s |
 <!-- bench:end -->
 
 ## Performance
@@ -204,21 +209,22 @@ Measured 2026-09-26 from Dubai, home connection against the live upstream, Node 
 
 | Call | First call | Repeat | Result size |
 | --- | --- | --- | --- |
-| check_packages: 5 npm packages (missing, deprecated, vulnerable, clean) | 1545 ms | 1.2 ms | 1,290 chars |
-| check_packages: 1 PyPI package | 1343 ms | 0.7 ms | 455 chars |
-| check_packages: 1 Go module | 1582 ms | 1.7 ms | 277 chars |
-| check_manifest: package.json, 5 entries | 2210 ms | 3.2 ms | 1,270 chars |
-| check_manifest: requirements.txt, 4 lines | 1490 ms | 0.5 ms | 926 chars |
-| get_advisories: express 4.17.1 | 2162 ms | 0.7 ms | 462 chars |
+| check_packages: 5 npm packages (missing, deprecated, vulnerable, clean) | 1556 ms | 1.1 ms | 1,290 chars |
+| check_packages: 1 PyPI package | 1358 ms | 0.4 ms | 455 chars |
+| check_packages: 1 Go module | 1721 ms | 1.9 ms | 277 chars |
+| check_manifest: package.json, 5 entries | 1779 ms | 4.4 ms | 1,270 chars |
+| check_manifest: requirements.txt, 4 lines | 1526 ms | 0.8 ms | 926 chars |
+| get_advisories: express 4.17.1 | 2137 ms | 0.3 ms | 462 chars |
 
 First call: a fresh server process, including the TLS connection and the upstream's own time. Repeat: the same call again, answered from the in-process cache, so it shows this server's own overhead.
 
-Tool definitions the model reads on every turn (name, description, input schema): 1,806 characters, against 5,496 for package-version-check-mcp, the best maintained alternative. The full tool list, with the output schemas and annotations clients use to validate results, is 3,986 characters (8,487 for the alternative).
+Tool definitions the model reads on every turn (name, description, input schema): 1,806 characters, against 5,496 for package-version-check-mcp, the best maintained alternative. The full tool list, with the output schemas and annotations clients use to validate results, is 3,899 characters (8,487 for the alternative).
 <!-- perf:end -->
 
 ## More MCP servers by Arhan Canli
 
 <!-- family:start -->
+- [End of Life](https://github.com/arhancanli/end-of-life-mcp): Is this version still supported? EOL dates, latest patch and upgrade target for 470+ products.
 - [Internet Standards](https://github.com/arhancanli/internet-standards-mcp): RFC sections, status, obsoleted-by chains, errata and IANA registries for coding agents.
 - [Citation Check](https://github.com/arhancanli/citation-check-mcp): Verifies citations: finds fabricated or mismatched references and retractions, returns clean BibTeX.
 - [Drug Label](https://github.com/arhancanli/drug-label-mcp): FDA drug label answers with section citations, RxNorm name resolution, recalls and shortages.

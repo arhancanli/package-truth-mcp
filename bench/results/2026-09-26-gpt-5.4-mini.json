@@ -1,0 +1,231 @@
+{
+  "date": "2026-09-26",
+  "model": "gpt-5.4-mini",
+  "competitor_label": "package-version-check-mcp, the best maintained alternative",
+  "rows": {
+    "ours": [
+      {
+        "id": "hallucinated-npm",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1254,
+        "output": 40,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 4617
+      },
+      {
+        "id": "missing-version",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1244,
+        "output": 40,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 3392
+      },
+      {
+        "id": "deprecated-npm",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1310,
+        "output": 51,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 2445
+      },
+      {
+        "id": "advisories-pinned",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1330,
+        "output": 61,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 3999
+      },
+      {
+        "id": "cve-alias",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1338,
+        "output": 45,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 2048
+      },
+      {
+        "id": "licence-pypi",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1239,
+        "output": 38,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 3319
+      },
+      {
+        "id": "requirements-missing",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1535,
+        "output": 94,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 3428
+      },
+      {
+        "id": "manifest-deprecated",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1444,
+        "output": 84,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 2795
+      },
+      {
+        "id": "range-resolution",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1268,
+        "output": 46,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 3143
+      },
+      {
+        "id": "go-module",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1264,
+        "output": 46,
+        "cache_read": 0,
+        "cache_write": 0,
+        "ms": 2605
+      }
+    ],
+    "competitor": [
+      {
+        "id": "hallucinated-npm",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 1682,
+        "output": 43,
+        "cache_read": 1152,
+        "cache_write": 0,
+        "ms": 2893
+      },
+      {
+        "id": "missing-version",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 513,
+        "output": 37,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 2179
+      },
+      {
+        "id": "deprecated-npm",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 529,
+        "output": 54,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 3043
+      },
+      {
+        "id": "advisories-pinned",
+        "correct": false,
+        "tool_calls": 1,
+        "input": 519,
+        "output": 83,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 2097
+      },
+      {
+        "id": "cve-alias",
+        "correct": false,
+        "tool_calls": 1,
+        "input": 527,
+        "output": 62,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 2946
+      },
+      {
+        "id": "licence-pypi",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 553,
+        "output": 41,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 3041
+      },
+      {
+        "id": "requirements-missing",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 766,
+        "output": 76,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 2831
+      },
+      {
+        "id": "manifest-deprecated",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 671,
+        "output": 55,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 2724
+      },
+      {
+        "id": "range-resolution",
+        "correct": false,
+        "tool_calls": 1,
+        "input": 535,
+        "output": 40,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 2872
+      },
+      {
+        "id": "go-module",
+        "correct": true,
+        "tool_calls": 1,
+        "input": 551,
+        "output": 40,
+        "cache_read": 2304,
+        "cache_write": 0,
+        "ms": 3126
+      }
+    ]
+  },
+  "summary": {
+    "ours": {
+      "tasks": 10,
+      "correct": 10,
+      "tokens_in": 13226,
+      "tokens_out": 545,
+      "cached_share": 0,
+      "tool_calls": 10,
+      "median_ms": 3319
+    },
+    "competitor": {
+      "tasks": 10,
+      "correct": 7,
+      "tokens_in": 28734,
+      "tokens_out": 531,
+      "cached_share": 0.762,
+      "tool_calls": 10,
+      "median_ms": 2893
+    }
+  }
+}

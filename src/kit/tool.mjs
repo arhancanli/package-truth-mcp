@@ -82,10 +82,27 @@ export function defineTool(t) {
   return Object.freeze({ ...t, input: t.input ?? {} });
 }
 
+/**
+ * Output schemas say what a result is guaranteed to contain, never what it may not contain:
+ * clients such as Claude Code and Cursor validate every result against the listed schema, so an
+ * "additionalProperties: false" there turns any extra field (a note, a licence, a count of what was
+ * left out) into a failed call. Every such closure is removed from output schemas.
+ */
+export function openObjects(schema) {
+  if (Array.isArray(schema)) return schema.map(openObjects);
+  if (!schema || typeof schema !== "object") return schema;
+  const out = {};
+  for (const [k, v] of Object.entries(schema)) {
+    if (k === "additionalProperties" && v === false) continue;
+    out[k] = openObjects(v);
+  }
+  return out;
+}
+
 function jsonSchema(shape, io) {
   const schema = z.toJSONSchema(z.object(shape), { target: "draft-7", io, unrepresentable: "any" });
   delete schema.$schema;
-  return schema;
+  return io === "output" ? openObjects(schema) : schema;
 }
 
 /** One tools/list entry: what a client (and usually the model) sees for the tool. */
