@@ -113,13 +113,15 @@ export function createLimiter(rules = []) {
  * @param {string[]} o.allowHosts   exact hostnames this server may call
  * @param {string}   o.userAgent    sent on every request; name the server and its repo
  * @param {number}  [o.timeoutMs]   deadline for the whole call, retries included
+ * @param {number}  [o.attemptTimeoutMs] a read attempt that has not answered by then is abandoned
+ *   and retried (within timeoutMs), so one stalled connection does not cost the whole deadline
  * @param {number}  [o.maxBytes]    largest body accepted
  * @param {number}  [o.retries]     extra attempts for reads
  * @param {import("./cache.mjs").TtlCache} [o.cache]  optional cache for successful GETs
  * @param {LimitRule[]} [o.limits] per-upstream rate limits (see createLimiter)
  * @param {typeof fetch} [o.fetchImpl]
  */
-export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBytes = 5 * 1024 * 1024, retries = 2, cache, limits, fetchImpl = fetch }) {
+export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, attemptTimeoutMs, maxBytes = 5 * 1024 * 1024, retries = 2, cache, limits, fetchImpl = fetch }) {
   if (!Array.isArray(allowHosts) || allowHosts.length === 0) throw new Error("createFetcher needs a non-empty allowHosts list");
   if (!userAgent) throw new Error("createFetcher needs a userAgent");
   const hosts = new Set(allowHosts.map((h) => h.toLowerCase()));
@@ -155,8 +157,9 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBy
         let hops = 0;
         for (;;) {
           const release = await acquire(url);
+          const signal = isRead && attemptTimeoutMs && attempt < retries ? AbortSignal.any([deadline, AbortSignal.timeout(attemptTimeoutMs)]) : deadline;
           try {
-            res = await fetchImpl(url, { method, headers: { "User-Agent": userAgent, Accept: accept, ...headers }, body, redirect: "manual", signal: deadline });
+            res = await fetchImpl(url, { method, headers: { "User-Agent": userAgent, Accept: accept, ...headers }, body, redirect: "manual", signal });
           } finally {
             release();
           }
