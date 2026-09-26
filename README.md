@@ -204,21 +204,22 @@ Measured 2026-09-26 from Dubai, home connection against the live upstream, Node 
 
 | Call | First call | Repeat | Result size |
 | --- | --- | --- | --- |
-| check_packages: 5 npm packages (missing, deprecated, vulnerable, clean) | 1516 ms | 0.8 ms | 1,290 chars |
-| check_packages: 1 PyPI package | 1481 ms | 0.5 ms | 455 chars |
-| check_packages: 1 Go module | 1575 ms | 1.7 ms | 277 chars |
-| check_manifest: package.json, 5 entries | 1901 ms | 3.9 ms | 1,270 chars |
-| check_manifest: requirements.txt, 4 lines | 1285 ms | 0.5 ms | 926 chars |
-| get_advisories: express 4.17.1 | 2026 ms | 0.5 ms | 462 chars |
+| check_packages: 5 npm packages (missing, deprecated, vulnerable, clean) | 1545 ms | 1.2 ms | 1,290 chars |
+| check_packages: 1 PyPI package | 1343 ms | 0.7 ms | 455 chars |
+| check_packages: 1 Go module | 1582 ms | 1.7 ms | 277 chars |
+| check_manifest: package.json, 5 entries | 2210 ms | 3.2 ms | 1,270 chars |
+| check_manifest: requirements.txt, 4 lines | 1490 ms | 0.5 ms | 926 chars |
+| get_advisories: express 4.17.1 | 2162 ms | 0.7 ms | 462 chars |
 
 First call: a fresh server process, including the TLS connection and the upstream's own time. Repeat: the same call again, answered from the in-process cache, so it shows this server's own overhead.
 
-Tool definitions sent to the model on every turn: 3,986 characters, against 8,487 for package-version-check-mcp, the best maintained alternative.
+Tool definitions the model reads on every turn (name, description, input schema): 1,806 characters, against 5,496 for package-version-check-mcp, the best maintained alternative. The full tool list, with the output schemas and annotations clients use to validate results, is 3,986 characters (8,487 for the alternative).
 <!-- perf:end -->
 
 ## More MCP servers by Arhan Canli
 
 <!-- family:start -->
+- [Citation Check](https://github.com/arhancanli/citation-check-mcp): Verifies citations: finds fabricated or mismatched references and retractions, returns clean BibTeX.
 - [The whole collection](https://github.com/arhancanli/mcp-factory#servers)
 <!-- family:end -->
 

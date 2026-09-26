@@ -3,46 +3,48 @@
   "where": "Dubai, home connection",
   "node": "v24.19.0",
   "runs": 5,
-  "tool_definition_chars": 3986,
+  "tool_definition_chars": 1806,
+  "tools_list_chars": 3986,
   "competitor": {
     "label": "package-version-check-mcp, the best maintained alternative",
-    "tool_definition_chars": 8487
+    "tool_definition_chars": 5496,
+    "tools_list_chars": 8487
   },
   "scenarios": [
     {
       "call": "check_packages: 5 npm packages (missing, deprecated, vulnerable, clean)",
-      "first_call_ms": 1516,
-      "repeat_ms": 0.8,
+      "first_call_ms": 1545,
+      "repeat_ms": 1.2,
       "result_chars": 1290
     },
     {
       "call": "check_packages: 1 PyPI package",
-      "first_call_ms": 1481,
-      "repeat_ms": 0.5,
+      "first_call_ms": 1343,
+      "repeat_ms": 0.7,
       "result_chars": 455
     },
     {
       "call": "check_packages: 1 Go module",
-      "first_call_ms": 1575,
+      "first_call_ms": 1582,
       "repeat_ms": 1.7,
       "result_chars": 277
     },
     {
       "call": "check_manifest: package.json, 5 entries",
-      "first_call_ms": 1901,
-      "repeat_ms": 3.9,
+      "first_call_ms": 2210,
+      "repeat_ms": 3.2,
       "result_chars": 1270
     },
     {
       "call": "check_manifest: requirements.txt, 4 lines",
-      "first_call_ms": 1285,
+      "first_call_ms": 1490,
       "repeat_ms": 0.5,
       "result_chars": 926
     },
     {
       "call": "get_advisories: express 4.17.1",
-      "first_call_ms": 2026,
-      "repeat_ms": 0.5,
+      "first_call_ms": 2162,
+      "repeat_ms": 0.7,
       "result_chars": 462
     }
   ],

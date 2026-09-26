@@ -59,14 +59,53 @@ async function readCapped(res, maxBytes, host) {
   return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString("utf8");
 }
 
-function retryDelay(res, attempt) {
+function retryAfterMs(res) {
   const header = res?.headers.get("retry-after");
-  if (header) {
-    const seconds = Number(header);
-    const ms = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(header) - Date.now();
-    if (Number.isFinite(ms) && ms >= 0) return Math.min(ms, MAX_RETRY_AFTER_MS);
-  }
+  if (!header) return undefined;
+  const seconds = Number(header);
+  const ms = Number.isFinite(seconds) ? seconds * 1000 : Date.parse(header) - Date.now();
+  return Number.isFinite(ms) && ms >= 0 ? ms : undefined;
+}
+
+function retryDelay(res, attempt) {
+  const asked = retryAfterMs(res);
+  if (asked !== undefined) return Math.min(asked, MAX_RETRY_AFTER_MS);
   return Math.min(250 * 2 ** attempt + Math.floor(Math.random() * 100), MAX_RETRY_AFTER_MS);
+}
+
+/**
+ * Per-upstream rate limits, so a server keeps to each API's published policy instead of collecting
+ * 429s. A rule matches by host (and optionally a path test); its perSecond spaces request starts
+ * for that rule, and its concurrency caps requests in flight for every rule sharing its group.
+ * The first matching rule applies.
+ * @typedef {{host: string, path?: RegExp, group?: string, perSecond?: number, concurrency?: number}} LimitRule
+ */
+export function createLimiter(rules = []) {
+  const groups = new Map();
+  const lastStart = new Map();
+  const state = (g, max) => {
+    if (!groups.has(g)) groups.set(g, { active: 0, max, queue: [] });
+    return groups.get(g);
+  };
+  return async function acquire(url) {
+    const i = rules.findIndex((r) => r.host === url.hostname && (!r.path || r.path.test(url.pathname + url.search)));
+    if (i < 0) return () => {};
+    const rule = rules[i];
+    const g = state(rule.group ?? rule.host, rule.concurrency ?? Infinity);
+    if (g.active >= g.max) await new Promise((resolve) => g.queue.push(resolve));
+    g.active++;
+    if (rule.perSecond) {
+      const gap = 1000 / rule.perSecond;
+      const next = (lastStart.get(i) ?? -Infinity) + gap;
+      const now = Date.now();
+      lastStart.set(i, Math.max(now, next));
+      if (next > now) await sleep(next - now);
+    }
+    return () => {
+      g.active--;
+      g.queue.shift()?.();
+    };
+  };
 }
 
 /**
@@ -77,12 +116,14 @@ function retryDelay(res, attempt) {
  * @param {number}  [o.maxBytes]    largest body accepted
  * @param {number}  [o.retries]     extra attempts for reads
  * @param {import("./cache.mjs").TtlCache} [o.cache]  optional cache for successful GETs
+ * @param {LimitRule[]} [o.limits] per-upstream rate limits (see createLimiter)
  * @param {typeof fetch} [o.fetchImpl]
  */
-export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBytes = 5 * 1024 * 1024, retries = 2, cache, fetchImpl = fetch }) {
+export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBytes = 5 * 1024 * 1024, retries = 2, cache, limits, fetchImpl = fetch }) {
   if (!Array.isArray(allowHosts) || allowHosts.length === 0) throw new Error("createFetcher needs a non-empty allowHosts list");
   if (!userAgent) throw new Error("createFetcher needs a userAgent");
   const hosts = new Set(allowHosts.map((h) => h.toLowerCase()));
+  const acquire = createLimiter(limits);
   // Identical reads already in flight share one upstream call: an agent checking a manifest, or
   // several tools resolving the same record, costs one request and one wait instead of many.
   const inFlight = new Map();
@@ -113,7 +154,12 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBy
       try {
         let hops = 0;
         for (;;) {
-          res = await fetchImpl(url, { method, headers: { "User-Agent": userAgent, Accept: accept, ...headers }, body, redirect: "manual", signal: deadline });
+          const release = await acquire(url);
+          try {
+            res = await fetchImpl(url, { method, headers: { "User-Agent": userAgent, Accept: accept, ...headers }, body, redirect: "manual", signal: deadline });
+          } finally {
+            release();
+          }
           if (res.status < 300 || res.status >= 400) break;
           const location = res.headers.get("location");
           await res.body?.cancel().catch(() => {});
@@ -129,7 +175,10 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBy
         }
         throw new UpstreamError("upstream_unreachable", `${url.hostname} could not be reached.`);
       }
-      if (RETRY_STATUSES.has(res.status) && isRead && attempt < retries) {
+      // A Retry-After longer than the cap means "not soon" (for example, a daily quota): retrying
+      // early would be refused again, so the answer is returned now instead.
+      const askedMs = retryAfterMs(res);
+      if (RETRY_STATUSES.has(res.status) && isRead && attempt < retries && !(askedMs > MAX_RETRY_AFTER_MS)) {
         const wait = retryDelay(res, attempt);
         await res.body?.cancel().catch(() => {});
         await sleep(wait);
