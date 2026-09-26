@@ -14,7 +14,7 @@ export function page(items, limit) {
 export function clip(text, maxChars) {
   if (typeof text !== "string") return text;
   if (text.length <= maxChars) return text;
-  return `${text.slice(0, maxChars)} [clipped: ${text.length - maxChars} more characters]`;
+  return `${text.slice(0, maxChars).trimEnd()} [clipped: ${text.length - maxChars} more characters]`;
 }
 
 /** Drops keys whose value is undefined, null, an empty string or an empty array. */
