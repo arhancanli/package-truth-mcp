@@ -33,6 +33,9 @@ function pickDefault(versions) {
  */
 export async function checkPackage(fetcher, ecosystem, rawName, { version, range } = {}, now = Date.now()) {
   const name = normalizeName(ecosystem, rawName);
+  // With an exact version, the package list and that version's details are fetched in parallel.
+  const earlyDetail = version !== undefined ? getVersion(fetcher, ecosystem, name, version) : undefined;
+  earlyDetail?.catch(() => {});
   const pkg = await getPackage(fetcher, ecosystem, name);
   if (!pkg || !Array.isArray(pkg.versions) || pkg.versions.length === 0) {
     return compact({ name: rawName, version, verdict: "does_not_exist", flags: ["not_found"], note: "The registry has no package with this name. It may be misspelled or hallucinated; do not install it." });
@@ -53,7 +56,11 @@ export async function checkPackage(fetcher, ecosystem, rawName, { version, range
     if (resolved === undefined) flags.push("range_not_understood_checked_latest");
     else target = resolved;
   }
-  const detail = await getVersion(fetcher, ecosystem, name, target);
+  // The latest version's details are fetched alongside the target's, since a vulnerable target is
+  // reported with how many advisories remain at the latest version.
+  const latestDetailP = target !== latestVersion ? getVersion(fetcher, ecosystem, name, latestVersion) : undefined;
+  latestDetailP?.catch(() => {});
+  const detail = await (target === version && earlyDetail ? earlyDetail : getVersion(fetcher, ecosystem, name, target));
   const advisories = (detail?.advisoryKeys ?? []).map((a) => a.id).sort();
   const published = versions.map((v) => v.publishedAt).filter(Boolean).sort();
   const firstPublished = published[0];
@@ -70,10 +77,7 @@ export async function checkPackage(fetcher, ecosystem, rawName, { version, range
   else if (flags.includes("new_package") || flags.includes("few_versions")) verdict = "verify";
 
   let latestAdvisories;
-  if (advisories.length && target !== latestVersion) {
-    const latestDetail = await getVersion(fetcher, ecosystem, name, latestVersion);
-    latestAdvisories = (latestDetail?.advisoryKeys ?? []).length;
-  }
+  if (advisories.length && latestDetailP) latestAdvisories = ((await latestDetailP)?.advisoryKeys ?? []).length;
 
   return compact({
     name: rawName,

@@ -1,19 +1,93 @@
 {
   "competitor": {
-    "label": "package-version-check-mcp 8 stars (the best maintained incumbent, scout 2026-09-26)",
+    "label": "package-version-check-mcp, the best maintained alternative",
     "command": "uvx",
-    "args": ["package-version-check-mcp", "--mode=stdio"]
+    "args": [
+      "package-version-check-mcp",
+      "--mode=stdio"
+    ]
   },
   "tasks": [
-    { "id": "hallucinated-npm", "prompt": "I'm about to run `npm install left-pad-hallucinated-zz9`. Does that package exist on npm? Answer yes or no.", "expect": { "regex": "^no\\b" } },
-    { "id": "missing-version", "prompt": "Was version 99.0.0 of the npm package express ever published? Answer yes or no.", "expect": { "regex": "^no\\b" } },
-    { "id": "deprecated-npm", "prompt": "Should a new Node.js project add the npm package `request` as a dependency? Answer yes or no, and say why in three words.", "expect": { "regex": "^no\\b" } },
-    { "id": "advisories-pinned", "prompt": "List the GitHub security advisory IDs (GHSA-...) that affect express 4.17.1 on npm.", "expect": { "contains": ["GHSA-rv95-896h-c2vc", "GHSA-qw6h-vgh9-j6wx"] } },
-    { "id": "cve-alias", "prompt": "Which CVE ID is the advisory GHSA-rv95-896h-c2vc that affects express 4.17.1?", "expect": { "contains": ["CVE-2024-29041"] } },
-    { "id": "licence-pypi", "prompt": "What licence does the latest version of the PyPI package flask use? Give the SPDX identifier.", "expect": { "contains": ["BSD-3-Clause"] } },
-    { "id": "requirements-missing", "prompt": "Which of these requirements.txt entries is not a real PyPI package?\n\nrequests==2.31.0\nflask>=3.0\nnot-a-real-pkg-qq7==0.1\n\nGive only the package name.", "expect": { "contains": ["not-a-real-pkg-qq7"] } },
-    { "id": "manifest-deprecated", "prompt": "Which dependency in this package.json is deprecated by its maintainer? Give only the name.\n\n{\"dependencies\":{\"express\":\"^5.0.0\",\"request\":\"^2.88.0\",\"lodash\":\"^4.17.21\"}}", "expect": { "contains": ["request"] } },
-    { "id": "range-resolution", "prompt": "My package.json has \"typescript\": \"^5.0.0\". Which exact TypeScript version will `npm install` pick today? Give only the version.", "expect": { "regex": "^5\\.9\\.\\d+$" } },
-    { "id": "go-module", "prompt": "Does version v1.9.1 of the Go module github.com/gin-gonic/gin exist? Answer yes or no.", "expect": { "regex": "^yes\\b" } }
+    {
+      "id": "hallucinated-npm",
+      "prompt": "I'm about to run `npm install left-pad-hallucinated-zz9`. Does that package exist on npm? Answer yes or no.",
+      "expect": {
+        "regex": "^no\\b"
+      }
+    },
+    {
+      "id": "missing-version",
+      "prompt": "Was version 99.0.0 of the npm package express ever published? Answer yes or no.",
+      "expect": {
+        "regex": "^no\\b"
+      }
+    },
+    {
+      "id": "deprecated-npm",
+      "prompt": "Should a new Node.js project add the npm package `request` as a dependency? Answer yes or no, and say why in three words.",
+      "expect": {
+        "regex": "^no\\b"
+      }
+    },
+    {
+      "id": "advisories-pinned",
+      "prompt": "List the GitHub security advisory IDs (GHSA-...) that affect express 4.17.1 on npm.",
+      "expect": {
+        "contains": [
+          "GHSA-rv95-896h-c2vc",
+          "GHSA-qw6h-vgh9-j6wx"
+        ]
+      }
+    },
+    {
+      "id": "cve-alias",
+      "prompt": "Which CVE ID is the advisory GHSA-rv95-896h-c2vc that affects express 4.17.1?",
+      "expect": {
+        "contains": [
+          "CVE-2024-29041"
+        ]
+      }
+    },
+    {
+      "id": "licence-pypi",
+      "prompt": "What licence does the latest version of the PyPI package flask use? Give the SPDX identifier.",
+      "expect": {
+        "contains": [
+          "BSD-3-Clause"
+        ]
+      }
+    },
+    {
+      "id": "requirements-missing",
+      "prompt": "Which of these requirements.txt entries is not a real PyPI package?\n\nrequests==2.31.0\nflask>=3.0\nnot-a-real-pkg-qq7==0.1\n\nGive only the package name.",
+      "expect": {
+        "contains": [
+          "not-a-real-pkg-qq7"
+        ]
+      }
+    },
+    {
+      "id": "manifest-deprecated",
+      "prompt": "Which dependency in this package.json is deprecated by its maintainer? Give only the name.\n\n{\"dependencies\":{\"express\":\"^5.0.0\",\"request\":\"^2.88.0\",\"lodash\":\"^4.17.21\"}}",
+      "expect": {
+        "contains": [
+          "request"
+        ]
+      }
+    },
+    {
+      "id": "range-resolution",
+      "prompt": "My package.json has \"typescript\": \"^5.0.0\". Which exact TypeScript version will `npm install` pick today? Give only the version.",
+      "expect": {
+        "regex": "^5\\.9\\.\\d+$"
+      }
+    },
+    {
+      "id": "go-module",
+      "prompt": "Does version v1.9.1 of the Go module github.com/gin-gonic/gin exist? Answer yes or no.",
+      "expect": {
+        "regex": "^yes\\b"
+      }
+    }
   ]
 }

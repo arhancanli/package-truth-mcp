@@ -72,6 +72,103 @@ docker build -t package-truth-mcp https://github.com/arhancanli/package-truth-mc
 **Hosted (Streamable HTTP)**: `node src/server.mjs --http` serves stateless MCP at `POST /mcp` (port from `PORT`, default 3000).
 <!-- install:end -->
 
+## Example
+
+<!-- example:start -->
+An agent calls `check_packages` with:
+
+```json
+{
+  "ecosystem": "npm",
+  "packages": [
+    {
+      "name": "express"
+    },
+    {
+      "name": "request"
+    },
+    {
+      "name": "express",
+      "version": "4.17.1"
+    },
+    {
+      "name": "express",
+      "version": "99.0.0"
+    },
+    {
+      "name": "left-pad-hallucinated-zz9"
+    }
+  ]
+}
+```
+
+and gets back (recorded from the live server on 2026-09-26):
+
+```json
+{
+  "ecosystem": "npm",
+  "counts": {
+    "does_not_exist": 2,
+    "risky": 2,
+    "verify": 0,
+    "ok": 1
+  },
+  "results": [
+    {
+      "name": "express",
+      "version": "99.0.0",
+      "latest": "5.2.1",
+      "verdict": "does_not_exist",
+      "flags": [
+        "version_not_found"
+      ],
+      "note": "Version 99.0.0 was never published. The latest is 5.2.1."
+    },
+    {
+      "name": "left-pad-hallucinated-zz9",
+      "verdict": "does_not_exist",
+      "flags": [
+        "not_found"
+      ],
+      "note": "The registry has no package with this name. It may be misspelled or hallucinated; do not install it."
+    },
+    {
+      "name": "request",
+      "version": "2.88.2",
+      "latest": "2.88.2",
+      "verdict": "risky",
+      "flags": [
+        "deprecated",
+        "vulnerable",
+        "no_release_in_3_years"
+      ],
+      "deprecated_reason": "request has been deprecated, see https://github.com/request/request/issues/3142",
+      "advisories": [
+        "GHSA-p8p7-x288-28g6"
+      ],
+      "license": "Apache-2.0",
+      "first_published": "2011-01-22",
+      "latest_published": "2020-02-11",
+      "version_count": 126
+    },
+    {
+      "name": "express",
+      "version": "4.17.1",
+      "latest": "5.2.1",
+      "verdict": "risky",
+      "flags": [
+        "vulnerable"
+      ],
+      "advisories": [
+        "GHSA-qw6h-vgh9-j6wx",
+        "GHSA-rv95-896h-c2vc"
+      ],
+      "latest_advisory_count": 0,
+      "license": "MIT",
+... (16 more lines)
+```
+<!-- example:end -->
+
 ## Tools
 
 <!-- tools:start -->
@@ -99,6 +196,25 @@ docker build -t package-truth-mcp https://github.com/arhancanli/package-truth-mc
 <!-- bench:start -->
 Not yet measured.
 <!-- bench:end -->
+
+## Performance
+
+<!-- perf:start -->
+Measured 2026-09-26 from Dubai, home connection against the live upstream, Node 24.19.0 (`bench/perf.json`, `scripts/perf.mjs` in the factory).
+
+| Call | First call | Repeat | Result size |
+| --- | --- | --- | --- |
+| check_packages: 5 npm packages (missing, deprecated, vulnerable, clean) | 1516 ms | 0.8 ms | 1,290 chars |
+| check_packages: 1 PyPI package | 1481 ms | 0.5 ms | 455 chars |
+| check_packages: 1 Go module | 1575 ms | 1.7 ms | 277 chars |
+| check_manifest: package.json, 5 entries | 1901 ms | 3.9 ms | 1,270 chars |
+| check_manifest: requirements.txt, 4 lines | 1285 ms | 0.5 ms | 926 chars |
+| get_advisories: express 4.17.1 | 2026 ms | 0.5 ms | 462 chars |
+
+First call: a fresh server process, including the TLS connection and the upstream's own time. Repeat: the same call again, answered from the in-process cache, so it shows this server's own overhead.
+
+Tool definitions sent to the model on every turn: 3,986 characters, against 8,487 for package-version-check-mcp, the best maintained alternative.
+<!-- perf:end -->
 
 ## More MCP servers by Arhan Canli
 

@@ -1,0 +1,76 @@
+{
+  "measured_on": "2026-09-26",
+  "where": "Dubai, home connection",
+  "node": "v24.19.0",
+  "runs": 5,
+  "tool_definition_chars": 3986,
+  "competitor": {
+    "label": "package-version-check-mcp, the best maintained alternative",
+    "tool_definition_chars": 8487
+  },
+  "scenarios": [
+    {
+      "call": "check_packages: 5 npm packages (missing, deprecated, vulnerable, clean)",
+      "first_call_ms": 1516,
+      "repeat_ms": 0.8,
+      "result_chars": 1290
+    },
+    {
+      "call": "check_packages: 1 PyPI package",
+      "first_call_ms": 1481,
+      "repeat_ms": 0.5,
+      "result_chars": 455
+    },
+    {
+      "call": "check_packages: 1 Go module",
+      "first_call_ms": 1575,
+      "repeat_ms": 1.7,
+      "result_chars": 277
+    },
+    {
+      "call": "check_manifest: package.json, 5 entries",
+      "first_call_ms": 1901,
+      "repeat_ms": 3.9,
+      "result_chars": 1270
+    },
+    {
+      "call": "check_manifest: requirements.txt, 4 lines",
+      "first_call_ms": 1285,
+      "repeat_ms": 0.5,
+      "result_chars": 926
+    },
+    {
+      "call": "get_advisories: express 4.17.1",
+      "first_call_ms": 2026,
+      "repeat_ms": 0.5,
+      "result_chars": 462
+    }
+  ],
+  "example": {
+    "call": "check_packages: 5 npm packages (missing, deprecated, vulnerable, clean)",
+    "tool": "check_packages",
+    "arguments": {
+      "ecosystem": "npm",
+      "packages": [
+        {
+          "name": "express"
+        },
+        {
+          "name": "request"
+        },
+        {
+          "name": "express",
+          "version": "4.17.1"
+        },
+        {
+          "name": "express",
+          "version": "99.0.0"
+        },
+        {
+          "name": "left-pad-hallucinated-zz9"
+        }
+      ]
+    },
+    "result": "{\"ecosystem\":\"npm\",\"counts\":{\"does_not_exist\":2,\"risky\":2,\"verify\":0,\"ok\":1},\"results\":[{\"name\":\"express\",\"version\":\"99.0.0\",\"latest\":\"5.2.1\",\"verdict\":\"does_not_exist\",\"flags\":[\"version_not_found\"],\"note\":\"Version 99.0.0 was never published. The latest is 5.2.1.\"},{\"name\":\"left-pad-hallucinated-zz9\",\"verdict\":\"does_not_exist\",\"flags\":[\"not_found\"],\"note\":\"The registry has no package with this name. It may be misspelled or hallucinated; do not install it.\"},{\"name\":\"request\",\"version\":\"2.88.2\",\"latest\":\"2.88.2\",\"verdict\":\"risky\",\"flags\":[\"deprecated\",\"vulnerable\",\"no_release_in_3_years\"],\"deprecated_reason\":\"request has been deprecated, see https://github.com/request/request/issues/3142\",\"advisories\":[\"GHSA-p8p7-x288-28g6\"],\"license\":\"Apache-2.0\",\"first_published\":\"2011-01-22\",\"latest_published\":\"2020-02-11\",\"version_count\":126},{\"name\":\"express\",\"version\":\"4.17.1\",\"latest\":\"5.2.1\",\"verdict\":\"risky\",\"flags\":[\"vulnerable\"],\"advisories\":[\"GHSA-qw6h-vgh9-j6wx\",\"GHSA-rv95-896h-c2vc\"],\"latest_advisory_count\":0,\"license\":\"MIT\",\"first_published\":\"2010-12-29\",\"latest_published\":\"2025-12-01\",\"version_count\":289},{\"name\":\"express\",\"version\":\"5.2.1\",\"latest\":\"5.2.1\",\"verdict\":\"ok\",\"license\":\"MIT\",\"first_published\":\"2010-12-29\",\"latest_published\":\"2025-12-01\",\"version_count\":289}]}"
+  }
+}

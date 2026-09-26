@@ -18,11 +18,15 @@ export const getAdvisories = defineTool({
   annotations: READ_ONLY,
   handler: async ({ ecosystem: eco, name, version }, { fetcher }) => {
     const norm = normalizeName(eco, name);
+    const earlyDetail = version !== undefined ? getVersion(fetcher, eco, norm, version) : undefined;
+    earlyDetail?.catch(() => {});
     const pkg = await getPackage(fetcher, eco, norm);
     if (!pkg?.versions?.length) throw new ToolError("not_found", `The ${eco} registry has no package named ${name}.`);
     const latest = (pkg.versions.find((v) => v.isDefault) ?? pkg.versions.at(-1)).versionKey.version;
     const target = version ?? latest;
-    const detail = await getVersion(fetcher, eco, norm, target);
+    const latestP = target === latest ? undefined : getVersion(fetcher, eco, norm, latest);
+    latestP?.catch(() => {});
+    const detail = await (earlyDetail ?? getVersion(fetcher, eco, norm, target));
     if (!detail) throw new ToolError("version_not_found", `${name} has no version ${target}. The latest is ${latest}.`);
     const ids = (detail.advisoryKeys ?? []).map((a) => a.id).sort();
     const advisories = await mapLimit(ids, 8, async (id) => {
@@ -34,7 +38,7 @@ export const getAdvisories = defineTool({
       if (a?.url) row.url = a.url;
       return row;
     });
-    const latestDetail = target === latest ? detail : await getVersion(fetcher, eco, norm, latest);
+    const latestDetail = latestP ? await latestP : detail;
     return { name, version: target, latest, latest_advisory_count: (latestDetail?.advisoryKeys ?? []).length, advisories };
   },
 });

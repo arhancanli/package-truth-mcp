@@ -83,8 +83,23 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBy
   if (!Array.isArray(allowHosts) || allowHosts.length === 0) throw new Error("createFetcher needs a non-empty allowHosts list");
   if (!userAgent) throw new Error("createFetcher needs a userAgent");
   const hosts = new Set(allowHosts.map((h) => h.toLowerCase()));
+  // Identical reads already in flight share one upstream call: an agent checking a manifest, or
+  // several tools resolving the same record, costs one request and one wait instead of many.
+  const inFlight = new Map();
 
-  async function request(raw, { method = "GET", headers = {}, body, accept = "application/json" } = {}) {
+  function request(raw, opts = {}) {
+    const { method = "GET", headers = {}, accept = "application/json" } = opts;
+    const isRead = method === "GET" || method === "HEAD";
+    if (!isRead || Object.keys(headers).length) return send(raw, opts);
+    const key = `${method} ${accept} ${raw}`;
+    const pending = inFlight.get(key);
+    if (pending) return pending;
+    const p = send(raw, opts).finally(() => inFlight.delete(key));
+    inFlight.set(key, p);
+    return p;
+  }
+
+  async function send(raw, { method = "GET", headers = {}, body, accept = "application/json" } = {}) {
     const isRead = method === "GET" || method === "HEAD";
     const cacheKey = isRead && cache ? `${accept} ${raw}` : undefined;
     if (cacheKey) {
@@ -123,7 +138,9 @@ export function createFetcher({ allowHosts, userAgent, timeoutMs = 15_000, maxBy
       }
       const text = await readCapped(res, maxBytes, url.hostname);
       const out = { status: res.status, ok: res.ok, url: url.href, text, headers: res.headers };
-      if (cacheKey && res.ok) cache.set(cacheKey, out);
+      // 404 and 410 are answers ("no such thing"), not failures, so they are cached like successes:
+      // an agent that asks again about a missing package gets the answer without another round trip.
+      if (cacheKey && (res.ok || res.status === 404 || res.status === 410)) cache.set(cacheKey, out);
       return out;
     }
   }
