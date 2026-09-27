@@ -230,9 +230,9 @@ Tool definitions the model reads on every turn (name, description, input schema)
 - [Domain Health](https://github.com/arhancanli/domain-health-mcp): Email and domain checks: SPF lookup limits, DKIM keys, DMARC, DNS records, registration expiry.
 - [End of Life](https://github.com/arhancanli/end-of-life-mcp): Is this version still supported? EOL dates, latest patch and upgrade target for 470+ products.
 - [Internet Standards](https://github.com/arhancanli/internet-standards-mcp): RFC sections, status, obsoleted-by chains, errata and IANA registries for coding agents.
+- [Kube Check](https://github.com/arhancanli/kube-check-mcp): Checks Kubernetes manifests for your version: removed APIs, unknown fields, Pod Security, risks.
 - [License Check](https://github.com/arhancanli/license-check-mcp): Open source license answers: SPDX ids, copyleft, and whether a dependency's license fits yours.
-- [Release Notes](https://github.com/arhancanli/release-notes-mcp): What changed between two versions of a package: breaking changes, deprecations, security fixes.
-- [The whole collection](https://github.com/arhancanli/mcp-factory#servers), 8 more
+- [The whole collection](https://github.com/arhancanli/mcp-factory#servers), 9 more
 <!-- family:end -->
 
 ## License
